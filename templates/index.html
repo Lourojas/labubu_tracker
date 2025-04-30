@@ -1,0 +1,158 @@
+{% extends "layout.html" %}
+
+{% block title %}Labubu Stock - Home{% endblock %}
+
+{% block content %}
+<div class="page-header text-center">
+    <h1><i class="fas fa-chart-line me-2"></i> Labubu Stock</h1>
+    <p class="lead">Track and analyze your favorite stocks with real-time data</p>
+    <div class="search-container mt-4">
+        <form action="{{ url_for('search') }}" method="get">
+            <div class="input-group input-group-lg">
+                <input type="text" class="form-control" name="keyword" placeholder="Search for stocks by name or symbol..." aria-label="Search for stocks">
+                <button class="btn btn-primary" type="submit">
+                    <i class="fas fa-search me-1"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">
+                    <i class="fas fa-fire me-2"></i> Trending Stocks
+                </h2>
+            </div>
+            <div class="card-body">
+                {% if stocks %}
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    {% for stock in stocks %}
+                    <div class="col">
+                        <div class="card h-100 stock-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title mb-0">
+                                        <a href="{{ url_for('stock_detail', symbol=stock.Symbol) }}" class="text-decoration-none">{{ stock.Symbol }}</a>
+                                    </h5>
+                                    {% if stock.Change and stock.Change != 'N/A' %}
+                                        {% set change = stock.Change|float %}
+                                        {% if change > 0 %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-arrow-up me-1"></i>{{ stock.ChangePercent }}
+                                        </span>
+                                        {% elif change < 0 %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-arrow-down me-1"></i>{{ stock.ChangePercent }}
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-minus me-1"></i>{{ stock.ChangePercent }}
+                                        </span>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                <h6 class="card-subtitle mb-3 text-muted">{{ stock.Name }}</h6>
+                                
+                                <div class="d-flex justify-content-between mb-3">
+                                    <div>
+                                        <small class="text-muted">Price</small>
+                                        <p class="mb-0 fs-5 fw-bold">
+                                            {% if stock.Price and stock.Price != 'N/A' %}
+                                                ${{ stock.Price }}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    {% if stock.get('MarketCapitalization') and stock.MarketCapitalization != 'N/A' %}
+                                    <div>
+                                        <small class="text-muted">Market Cap</small>
+                                        <p class="mb-0">
+                                            {% set mcap = stock.MarketCapitalization|int %}
+                                            {% if mcap >= 1000000000000 %}
+                                                ${{ (mcap / 1000000000000)|round(2) }}T
+                                            {% elif mcap >= 1000000000 %}
+                                                ${{ (mcap / 1000000000)|round(2) }}B
+                                            {% elif mcap >= 1000000 %}
+                                                ${{ (mcap / 1000000)|round(2) }}M
+                                            {% else %}
+                                                ${{ (mcap / 1000)|round(2) }}K
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <a href="{{ url_for('stock_detail', symbol=stock.Symbol) }}" class="btn btn-outline-primary">
+                                        <i class="fas fa-chart-area me-1"></i> View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> No stock data available at the moment. Please try again later.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-4 mb-4 mb-md-0">
+        <div class="card h-100">
+            <div class="card-header">
+                <h3 class="h5 mb-0"><i class="fas fa-search me-2"></i> Find Stocks</h3>
+            </div>
+            <div class="card-body">
+                <p>Search for stocks by company name or ticker symbol to get detailed information, historical data, and performance metrics.</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Real-time price updates</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Historical performance charts</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Company fundamentals</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4 mb-md-0">
+        <div class="card h-100">
+            <div class="card-header">
+                <h3 class="h5 mb-0"><i class="fas fa-chart-line me-2"></i> Track Performance</h3>
+            </div>
+            <div class="card-body">
+                <p>Monitor stock performance over different time periods with interactive charts and detailed metrics.</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Daily, weekly, and monthly views</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Price and volume analysis</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Trend indicators</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h3 class="h5 mb-0"><i class="fas fa-info-circle me-2"></i> Company Information</h3>
+            </div>
+            <div class="card-body">
+                <p>Get comprehensive information about companies including financial data, sector information, and key metrics.</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Company profiles</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Key financial metrics</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Industry comparisons</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

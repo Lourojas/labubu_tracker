@@ -1,0 +1,221 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ stock.Symbol }} - {{ stock.Name }} | Labubu Stock{% endblock %}
+
+{% block extra_head %}
+<script>
+    // Store the historical data for use in charts
+    window.historicalData = {{ historical_data|safe }};
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ stock.Symbol }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1>
+            {{ stock.Symbol }} 
+            <small class="text-muted">{{ stock.Name }}</small>
+        </h1>
+        <div class="d-flex align-items-center mb-4">
+            <h2 class="me-3 mb-0">
+                {% if stock.Price and stock.Price != 'N/A' %}
+                    ${{ stock.Price }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </h2>
+            
+            {% if stock.Change and stock.Change != 'N/A' %}
+                {% set change = stock.Change|float %}
+                {% if change > 0 %}
+                <span class="badge bg-success fs-6">
+                    <i class="fas fa-arrow-up me-1"></i>{{ stock.Change }} ({{ stock.ChangePercent }})
+                </span>
+                {% elif change < 0 %}
+                <span class="badge bg-danger fs-6">
+                    <i class="fas fa-arrow-down me-1"></i>{{ stock.Change }} ({{ stock.ChangePercent }})
+                </span>
+                {% else %}
+                <span class="badge bg-secondary fs-6">
+                    <i class="fas fa-minus me-1"></i>{{ stock.Change }} ({{ stock.ChangePercent }})
+                </span>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="h5 mb-0">Price History</h3>
+                    <div class="btn-group period-selector-container" role="group" aria-label="Time Period Selector">
+                        {% for period in periods %}
+                        <button type="button" 
+                                class="btn btn-sm btn-outline-primary period-selector {% if period == current_period %}active{% endif %}" 
+                                data-symbol="{{ stock.Symbol }}" 
+                                data-period="{{ period }}">
+                            {{ period }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-container position-relative">
+                    <canvas id="price-chart"></canvas>
+                    <div id="chart-loading" class="chart-loading d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="volume-chart-container position-relative">
+                    <canvas id="volume-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="h5 mb-0">Company Overview</h3>
+            </div>
+            <div class="card-body">
+                <p>{{ stock.get('Description', 'No description available.') }}</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="stock-stat">
+                            <h4>Exchange</h4>
+                            <p>{{ stock.get('Exchange', 'N/A') }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="stock-stat">
+                            <h4>Sector</h4>
+                            <p>{{ stock.get('Sector', 'N/A') }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="stock-stat">
+                            <h4>Industry</h4>
+                            <p>{{ stock.get('Industry', 'N/A') }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="stock-stat">
+                            <h4>Country</h4>
+                            <p>{{ stock.get('Country', 'N/A') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="h5 mb-0">Key Metrics</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="stock-stat">
+                            <h4>Market Cap</h4>
+                            <p>
+                                {% if stock.get('MarketCapitalization') and stock.MarketCapitalization != 'N/A' %}
+                                    {% set mcap = stock.MarketCapitalization|int %}
+                                    {% if mcap >= 1000000000000 %}
+                                        ${{ (mcap / 1000000000000)|round(2) }}T
+                                    {% elif mcap >= 1000000000 %}
+                                        ${{ (mcap / 1000000000)|round(2) }}B
+                                    {% elif mcap >= 1000000 %}
+                                        ${{ (mcap / 1000000)|round(2) }}M
+                                    {% else %}
+                                        ${{ (mcap / 1000)|round(2) }}K
+                                    {% endif %}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="stock-stat">
+                            <h4>P/E Ratio</h4>
+                            <p>{{ stock.get('PERatio', 'N/A') }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="stock-stat">
+                            <h4>EPS</h4>
+                            <p>{{ stock.get('EPS', 'N/A') }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="stock-stat">
+                            <h4>Dividend Yield</h4>
+                            <p>{{ stock.get('DividendYield', 'N/A') }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="stock-stat">
+                            <h4>52 Week High</h4>
+                            <p>{{ stock.get('52WeekHigh', 'N/A') }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="stock-stat">
+                            <h4>52 Week Low</h4>
+                            <p>{{ stock.get('52WeekLow', 'N/A') }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="stock-stat">
+                            <h4>Beta</h4>
+                            <p>{{ stock.get('Beta', 'N/A') }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="stock-stat">
+                            <h4>Volume</h4>
+                            <p>
+                                {% if stock.get('Volume') and stock.Volume != 'N/A' %}
+                                    {% set vol = stock.Volume|int %}
+                                    {% if vol >= 1000000 %}
+                                        {{ (vol / 1000000)|round(2) }}M
+                                    {% elif vol >= 1000 %}
+                                        {{ (vol / 1000)|round(2) }}K
+                                    {% else %}
+                                        {{ vol }}
+                                    {% endif %}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

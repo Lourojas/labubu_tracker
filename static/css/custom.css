@@ -1,0 +1,101 @@
+/* Custom styles - minimal as we're using Bootstrap */
+
+/* Stock card styling */
+.stock-card {
+    transition: transform 0.2s ease;
+}
+
+.stock-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Chart container styling */
+.chart-container {
+    position: relative;
+    height: 400px;
+    margin-bottom: 30px;
+}
+
+.volume-chart-container {
+    height: 150px;
+    margin-bottom: 30px;
+}
+
+/* Loading spinner overlay */
+.chart-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(33, 37, 41, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+/* Stock price changes */
+.price-up {
+    color: var(--bs-success);
+}
+
+.price-down {
+    color: var(--bs-danger);
+}
+
+/* Alert container */
+#alert-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    max-width: 350px;
+}
+
+/* Search form */
+.search-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Stock stats */
+.stock-stat {
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background-color: rgba(50, 50, 50, 0.1);
+}
+
+.stock-stat h4 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: var(--bs-secondary);
+}
+
+.stock-stat p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Period selector buttons */
+.period-selector-container {
+    margin-bottom: 20px;
+}
+
+/* Header */
+.page-header {
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    background-color: rgba(50, 50, 50, 0.1);
+    border-radius: 0.5rem;
+}
+
+/* Footer */
+.footer {
+    margin-top: 5rem;
+    padding: 2rem 0;
+    background-color: rgba(50, 50, 50, 0.1);
+}
