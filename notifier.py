@@ -1,22 +1,23 @@
 import requests
-import os
+from bs4 import BeautifulSoup
+from pushbullet import Pushbullet
 
-PUSHBULLET_API_KEY = os.environ.get("PUSHBULLET_API_KEY")
-PRODUCT_URL = "https://m.popmart.com/us/pop-now/set/195"
+def notify():
+    url = "https://m.popmart.com/us/pop-now/set/195"
+    api_key = os.getenv("PUSHBULLET_API_KEY")  # ya lo tienes en Render
 
-def send_push_notification():
-    data = {
-        "type": "note",
-        "title": "¡Labubu disponible!",
-        "body": f"Check: {PRODUCT_URL}"
-    }
-    headers = {
-        "Access-Token": PUSHBULLET_API_KEY,
-        "Content-Type": "application/json"
-    }
-    response = requests.post("https://api.pushbullet.com/v2/pushes", json=data, headers=headers)
-    print("Notificación enviada." if response.ok else f"Fallo al enviar notificación: {response.text}")
+    keywords = ["Buy Multiple Boxes", "Pick One to Shake"]
 
-if __name__ == "__main__":
-    print("Forzando envío de notificación para pruebas...")
-    send_push_notification()
+    try:
+        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+        soup = BeautifulSoup(response.text, "html.parser")
+        page_text = soup.get_text()
+
+        if any(keyword in page_text for keyword in keywords):
+            pb = Pushbullet(api_key)
+            pb.push_note("¡Labubu disponible!", f"{url}")
+            print("✅ Notificación enviada")
+        else:
+            print("❌ Aún no disponible")
+    except Exception as e:
+        print("Error:", e)
