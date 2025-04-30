@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from pushbullet import Pushbullet
+import os
 
 def notify():
     url = "https://m.popmart.com/us/pop-now/set/195"
@@ -21,3 +22,6 @@ def notify():
             print("❌ Aún no disponible")
     except Exception as e:
         print("Error:", e)
+
+if __name__ == "__main__":
+    notify()
