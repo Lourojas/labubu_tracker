@@ -4,6 +4,10 @@ from selenium.webdriver.common.by import By
 from pushbullet import Pushbullet
 import os
 import time
+import sys
+
+# Redirige todos los print al archivo temporal de logs
+sys.stdout = open('/tmp/log.txt', 'a')
 
 def notify():
     url = "https://m.popmart.com/us/pop-now/set/195"
@@ -16,13 +20,11 @@ def notify():
     options.add_argument("--disable-dev-shm-usage")
 
     try:
-        print("🌐 Abriendo URL...")
         driver = webdriver.Chrome(options=options)
         driver.get(url)
-        time.sleep(6)  # Esperar a que cargue el contenido dinámico
+        time.sleep(6)  # Espera para que se cargue el contenido dinámico
 
         page_text = driver.page_source
-        print("📄 Contenido cargado:", page_text[:500])  # Muestra los primeros 500 caracteres
 
         if any(keyword in page_text for keyword in keywords):
             pb = Pushbullet(api_key)
@@ -34,7 +36,10 @@ def notify():
         driver.quit()
 
     except Exception as e:
-        print("⚠️ Error:", e)
+        print("Error:", e)
 
 if __name__ == "__main__":
     notify()
+
+# Cierra el archivo de log
+sys.stdout.close()
