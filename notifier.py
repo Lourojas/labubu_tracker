@@ -18,7 +18,7 @@ def notify():
     try:
         driver = webdriver.Chrome(options=options)
         driver.get(url)
-        time.sleep(6)  # Espera a que cargue el contenido dinámico
+        time.sleep(6)  # Tiempo para cargar contenido dinámico
 
         page_text = driver.page_source
 
