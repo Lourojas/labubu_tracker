@@ -1,14 +1,14 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
 from pushbullet import Pushbullet
+import chromedriver_binary  # asegura que el chromedriver esté en PATH
 import os
 import time
-import chromedriver_binary  # ← esto lo asegura en el PATH
 
 def notify():
     url = "https://m.popmart.com/us/pop-now/set/195"
     api_key = os.getenv("PUSHBULLET_API_KEY")
+
     keywords = ["Buy Multiple Boxes", "Pick One to Shake"]
 
     options = Options()
@@ -19,7 +19,7 @@ def notify():
     try:
         driver = webdriver.Chrome(options=options)
         driver.get(url)
-        time.sleep(6)
+        time.sleep(6)  # Esperar que cargue contenido dinámico
         page_text = driver.page_source
 
         if any(keyword in page_text for keyword in keywords):
@@ -29,7 +29,6 @@ def notify():
         else:
             print("❌ Aún no disponible")
         driver.quit()
-
     except Exception as e:
         print("Error:", e)
 
