@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from pushbullet import Pushbullet
-import chromedriver_binary
+import chromedriver_autoinstaller
 import os
 import time
 
@@ -17,6 +17,7 @@ def notify():
     options.add_argument("--disable-dev-shm-usage")
 
     try:
+        chromedriver_autoinstaller.install()  # Descarga la versión correcta automáticamente
         driver = webdriver.Chrome(options=options)
         driver.get(url)
         time.sleep(6)
@@ -28,7 +29,9 @@ def notify():
             print("✅ Notificación enviada")
         else:
             print("❌ Aún no disponible")
+
         driver.quit()
+
     except Exception as e:
         print("Error:", e)
 
