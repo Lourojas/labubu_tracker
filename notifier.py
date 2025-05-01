@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from pushbullet import Pushbullet
-import chromedriver_binary  # asegura que el chromedriver esté en PATH
+import chromedriver_binary
 import os
 import time
 
@@ -19,7 +19,7 @@ def notify():
     try:
         driver = webdriver.Chrome(options=options)
         driver.get(url)
-        time.sleep(6)  # Esperar que cargue contenido dinámico
+        time.sleep(6)
         page_text = driver.page_source
 
         if any(keyword in page_text for keyword in keywords):
