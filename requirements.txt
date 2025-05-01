@@ -2,4 +2,4 @@ requests
 beautifulsoup4
 pushbullet.py
 selenium
-chromedriver-autoinstaller
+chromedriver-binary==120.0.6099.71.0
