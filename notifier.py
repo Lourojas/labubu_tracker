@@ -1,18 +1,26 @@
-import requests
-from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 from pushbullet import Pushbullet
 import os
+import time
 
 def notify():
     url = "https://m.popmart.com/us/pop-now/set/195"
-    api_key = os.getenv("PUSHBULLET_API_KEY")  # ya lo tienes en Render
-
+    api_key = os.getenv("PUSHBULLET_API_KEY")
     keywords = ["Buy Multiple Boxes", "Pick One to Shake"]
 
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+
     try:
-        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
-        soup = BeautifulSoup(response.text, "html.parser")
-        page_text = soup.get_text()
+        driver = webdriver.Chrome(options=options)
+        driver.get(url)
+        time.sleep(6)  # Espera a que cargue el contenido dinámico
+
+        page_text = driver.page_source
 
         if any(keyword in page_text for keyword in keywords):
             pb = Pushbullet(api_key)
@@ -20,6 +28,9 @@ def notify():
             print("✅ Notificación enviada")
         else:
             print("❌ Aún no disponible")
+
+        driver.quit()
+
     except Exception as e:
         print("Error:", e)
 
